@@ -1,0 +1,246 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dongchimi.egun</groupId>
+	<artifactId>EgunCarLog-GAE</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>EgunCarLog-GAE</name>
+	<description>차계부</description>
+
+	<properties>
+		<downloadSources>true</downloadSources>
+		
+		<!-- GAE Plugin ((almost) Any GAE Version) -->
+		<plugin.version>0.9.7-SNAPSHOT</plugin.version>
+		<gae.version>1.8.3</gae.version>
+		<gae-runtime.version>1.8.3</gae-runtime.version>
+		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
+		<gae.home>${settings.localRepository}/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
+
+		<spring.version>3.2.4.RELEASE</spring.version>
+		<jersey.version>1.17.1</jersey.version>
+		
+		<!-- These are setup by default. -->
+		<gae.wait>false</gae.wait>
+		<gae.stop.port>8081</gae.stop.port>
+		<gae.port>8888</gae.port>
+		<gae.address>127.0.0.1</gae.address>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-spring</artifactId>
+			<version>${jersey.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-context</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-web</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.6.10</version>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.4</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+
+		<!-- servlet, jstl -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.6</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>net.kindleit</groupId>
+				<artifactId>maven-gae-plugin</artifactId>
+				<!-- Use the snapshot until we get 9.6 released. -->
+				<version>${plugin.version}</version>
+				<configuration>
+					<unpackVersion>${gae.version}</unpackVersion>
+					<appDir>${webappDirectory}</appDir>
+					<sdkDir>${gae.home}</sdkDir>
+
+					<!-- Add credentials to ~/.m2/settings.xml <id>appengine-credentials</id> -->
+					<serverId>appengine-credentials</serverId>
+					<splitJars>true</splitJars>
+				</configuration>
+				<executions>
+					<!-- <execution> <id>unpack</id> <phase>validate</phase> <goals> <goal>unpack</goal> 
+						</goals> </execution> -->
+					<execution>
+						<id>start-gae</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>stop-gae</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+	            <dependency>
+	                <groupId>net.kindleit</groupId>
+	                <artifactId>gae-runtime</artifactId>
+	                <version>${gae-runtime.version}</version>
+	                <type>pom</type>
+	            </dependency>
+					<!-- Google App Engine API -->
+					<dependency>
+						<groupId>com.google.appengine</groupId>
+						<artifactId>appengine-api-1.0-sdk</artifactId>
+						<version>${gae.version}</version>
+					</dependency>
+					<!-- Google App Engine Runtime Dependencies -->
+					<dependency>
+						<groupId>org.apache.geronimo.specs</groupId>
+						<artifactId>geronimo-jta_1.1_spec</artifactId>
+						<version>1.1.1</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.geronimo.specs</groupId>
+						<artifactId>geronimo-jpa_3.0_spec</artifactId>
+						<version>1.1.1</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>javax.jdo</groupId>
+						<artifactId>jdo2-api</artifactId>
+						<version>2.3-eb</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.datanucleus</groupId>
+						<artifactId>datanucleus-core</artifactId>
+						<version>1.1.5</version>
+					</dependency>
+					<dependency>
+						<groupId>com.google.appengine.orm</groupId>
+						<artifactId>datanucleus-appengine</artifactId>
+						<version>1.0.10</version>
+						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.datanucleus</groupId>
+						<artifactId>datanucleus-jpa</artifactId>
+						<version>1.1.5</version>
+						<scope>runtime</scope>
+					</dependency>
+					<!-- App Engine Runtime Dependencies -->
+					<dependency>
+						<groupId>com.google.appengine</groupId>
+						<artifactId>appengine-tools-sdk</artifactId>
+						<version>${gae.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>sonatype.snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype.snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</pluginRepository>
+	</pluginRepositories>
+</project>
